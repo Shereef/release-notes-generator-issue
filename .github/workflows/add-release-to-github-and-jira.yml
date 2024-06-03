@@ -1,0 +1,33 @@
+name: Add release to GitHub and Jira
+on:
+  workflow_call:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  add-release-to-github:
+    name: Add release to GitHub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          check-latest: true
+      - name: Install Dependencies
+        run: npm i -g semantic-release @semantic-release/changelog @semantic-release/git @semantic-release/github @semantic-release/commit-analyzer @semantic-release/release-notes-generator
+      - name: Version and Github Release
+        id: semantic_release_info
+        run: npx semantic-release --debug
+        env:
+          GH_TOKEN: ${{ secrets.SEMANTIC_RELEASE }}
